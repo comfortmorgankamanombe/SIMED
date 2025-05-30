@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMED Pharmacy | Your Trusted Healthcare Partner</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary-color: #0d47a1;
+            --secondary-color: #42a5f5;
+            --accent-color: #e53935;
+            --light-blue: #e3f2fd;
+            --text-color: #333;
+            --white: #ffffff;
+            --overlay-color: rgba(13, 71, 161, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            color: var(--text-color);
+            position: relative;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: url('https://i.imgur.com/sHzUmlw.jpeg') no-repeat center center fixed;
+            background-size: cover;
+        }
+
+        .background-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--overlay-color);
+            z-index: -1;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            backdrop-filter: blur(5px);
+            background-color: rgba(255, 255, 255, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            position: relative;
+        }
+
+        .nav-menu > li {
+            position: relative;
+        }
+
+        .nav-menu a {
+            color: var(--text-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-menu a:hover {
+            color: var(--primary-color);
+            background-color: var(--light-blue);
+        }
+
+        .nav-menu a i {
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+
+        .dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--white);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            min-width: 250px;
+            z-index: 1000;
+            display: none;
+            padding: 15px;
+        }
+
+        .dropdown-columns {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .dropdown-column h4 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .dropdown-column ul {
+            list-style: none;
+        }
+
+        .dropdown-column li {
+            margin-bottom: 8px;
+        }
+
+        .dropdown-column a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s;
+            padding: 5px 0;
+            display: block;
+        }
+
+        .dropdown-column a:hover {
+            color: var(--primary-color);
+            background: none;
+            padding-left: 5px;
+        }
+
+        .nav-menu > li:hover .dropdown {
+            display: block;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-left: 2rem;
+        }
+
+        .cta-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .cta-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .cta-button i {
+            margin-right: 8px;
+        }
+
+        .cta-button.accent {
+            background: var(--accent-color);
+        }
+
+        .cta-button.accent:hover {
+            background: #c62828;
+        }
+
+        section {
+            padding: 5rem 10%;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            font-size: 1.2rem;
+            color: var(--light-blue);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            display: flex;
+            align-items: center;
+            min-height: 80vh;
+            padding: 5rem 10%;
+            color: var(--white);
+        }
+
+        .hero-content {
+            max-width: 600px;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        /* Prescription Section */
+        .prescription-form {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            background: var(--white);
+        }
+
+        .form-row {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+        .form-group textarea {
+            min-height: 150px;
+        }
+
+        .file-upload {
+            border: 2px dashed #ddd;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: var(--primary-color);
+            background: var(--light-blue);
+        }
+
+        .file-upload i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background: var(--white);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .service-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--light-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        /* Chatbot Styles */
+        .chatbot-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 999;
+            transition: all 0.3s;
+        }
+
+        .chatbot-btn:hover {
+            transform: scale(1.1);
+            background: var(--secondary-color);
+        }
+
+        .chatbot-modal {
+            display: none;
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            width: 350px;
+            max-width: 90%;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        .chatbot-header {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .chatbot-header h3 i {
+            margin-right: 8px;
+        }
+
+        .close-chatbot {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .chatbot-body {
+            height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f9f9f9;
+        }
+
+        .chatbot-message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 80%;
+        }
+
+        .chatbot-message.user-message {
+            margin-left: auto;
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .chatbot-input {
+            display: flex;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #eee;
+        }
+
+        .chatbot-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+
+        .chatbot-input button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-left: 10px;
+            cursor: pointer;
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 3rem 5%;
+            color: var(--white);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-column h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--white);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background: var(--accent-color);
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-column a {
+            color: #ddd;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-column a:hover {
+            color: var(--white);
+            padding-left: 5px;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .contact-item i {
+            margin-right: 10px;
+            color: var(--accent-color);
+            width: 20px;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            color: var(--white);
+            transition: all 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary-color);
+            transform: translateY(-3px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #aaa;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 992px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                padding: 1rem;
+            }
+            
+            .cta-buttons {
+                margin: 1rem 0 0;
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .hero {
+                text-align: center;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            
+            .section-header h2 {
+                font-size: 2rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="background-overlay"></div>
+
+    <header>
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-clinic-medical"></i>
+                SIMED PHARMACY
+            </div>
+        </div>
+        
+        <nav>
+            <ul class="nav-menu">
+                <li>
+                    <a href="#home">Home</a>
+                </li>
+                <li>
+                    <a href="#catalogue">Catalogue <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <div class="dropdown-columns">
+                            <div class="dropdown-column">
+                                <h4>HEALTH BAR</h4>
+                                <ul>
+                                    <li><a href="#">Universal</a></li>
+                                    <li><a href="#">Muscle Junkie</a></li>
+                                    <li><a href="#">Weight Management</a></li>
+                                    <li><a href="#">Healthy Foods</a></li>
+                                    <li><a href="#">FORTUNA</a></li>
+                                    <li><a href="#">REHABILITATION</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown-column">
+                                <h4>BABY BAR</h4>
+                                <ul>
+                                    <li><a href="#">Tommee Tippee</a></li>
+                                    <li><a href="#">Avent</a></li>
+                                    <li><a href="#">Nuby</a></li>
+                                    <li><a href="#">Nuk</a></li>
+                                    <li><a href="#">Toys</a></li>
+                                    <li><a href="#">For Mom</a></li>
+                                    <li><a href="#">Diapers & Wipes</a></li>
+                                    <li><a href="#">Food & Formula</a></li>
+                                    <li><a href="#">Baby Skin Care</a></li>
+                                    <li><a href="#">Baby Wear</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown-column">
+                                <h4>BEAUTY BAR</h4>
+                                <ul>
+                                    <li><a href="#">Gift-sets</a></li>
+                                    <li><a href="#">Cosmetic Cases/Bags</a></li>
+                                    <li><a href="#">General Beauty Bar</a></li>
+                                    <li><a href="#">Make-up</a></li>
+                                    <li><a href="#">Zaron</a></li>
+                                    <li><a href="#">Black Opal</a></li>
+                                    <li><a href="#">Revlon</a></li>
+                                    <li><a href="#">Neutrogena</a></li>
+                                    <li><a href="#">Ponds & Dermafix</a></li>
+                                    <li><a href="#">Cetaphil & Celltone</a></li>
+                                    <li><a href="#">The Ordinary/Lanbena</a></li>
+                                    <li><a href="#">DR RASHEL</a></li>
+                                    <li><a href="#">Rooibos</a></li>
+                                    <li><a href="#">Portia M</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown-column">
+                                <h4>PERSONAL CARE</h4>
+                                <ul>
+                                    <li><a href="#">Bath Care</a></li>
+                                    <li><a href="#">Eye Care</a></li>
+                                    <li><a href="#">Body Care</a></li>
+                                    <li><a href="#">Lip Care</a></li>
+                                    <li><a href="#">Oral Hygiene</a></li>
+                                    <li><a href="#">Hand & Foot Care</a></li>
+                                    <li><a href="#">Sunscreens</a></li>
+                                    <li><a href="#">Sanitary</a></li>
+                                    <li><a href="#">Ear care</a></li>
+                                </ul>
+                            </div>
+                            <div class="dropdown-column">
+                                <h4>OTHER CATEGORIES</h4>
+                                <ul>
+                                    <li><a href="#">FRAGRANCES</a></li>
+                                    <li><a href="#">MEN'S GROOMING</a></li>
+                                    <li><a href="#">OVER THE COUNTER</a></li>
+                                    <li><a href="#">Food & Services</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <a href="#services">Services <i class="fas fa-chevron-down"></i></a>
+                    <div class="dropdown">
+                        <div class="dropdown-column">
+                            <h4>FOOD & SERVICES</h4>
+                            <ul>
+                                <li><a href="#">Deliveries</a></li>
+                                <li><a href="#">Pack my parcel</a></li>
+                                <li><a href="#">Share the warmth</a></li>
+                                <li><a href="#">Piercing</a></li>
+                                <li><a href="#">Body Mass Index</a></li>
+                                <li><a href="#">Prescription</a></li>
+                                <li><a href="#">Medical Aids Accepted</a></li>
+                                <li><a href="#">The Booties Black Card</a></li>
+                                <li><a href="#">Front Shop</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <a href="#prescription">Prescription</a>
+                </li>
+                <li>
+                    <a href="#appointments">Appointments</a>
+                </li>
+                <li>
+                    <a href="#contact">Contact</a>
+                </li>
+            </ul>
+            
+            <div class="cta-buttons">
+                <a href="#appointments" class="cta-button">
+                    <i class="fas fa-calendar-check"></i> SIMED Appointments
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero Section -->
+        <section class="hero" id="home">
+            <div class="hero-content">
+                <h1>Your Health is Our Priority</h1>
+                <p>SIMED Pharmacy provides comprehensive pharmaceutical services, health products, and personalized care to support your wellness journey.</p>
+                <div class="hero-buttons">
+                    <a href="#prescription" class="cta-button">
+                        <i class="fas fa-prescription"></i> Upload Prescription
+                    </a>
+                    <a href="#appointments" class="cta-button accent">
+                        <i class="fas fa-calendar-alt"></i> Book Appointment
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Prescription Section -->
+        <section id="prescription">
+            <div class="section-header">
+                <h2>Prescription Service</h2>
+                <p>Upload your prescription and we'll prepare your medication for pickup or delivery</p>
+            </div>
+            
+            <div class="card prescription-form">
+                <form id="prescriptionForm">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="fullName">Full Name *</label>
+                            <input type="text" id="fullName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Phone Number *</label>
+                            <input type="tel" id="phone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="email">Email Address</label>
+                            <input type="email" id="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="delivery">Delivery Preference</label>
+                            <select id="delivery">
+                                <option value="pickup">Pickup at Pharmacy</option>
+                                <option value="delivery">Home Delivery</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="notes">Special Instructions</label>
+                        <textarea id="notes" placeholder="Any special instructions or notes for our pharmacists..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload Prescription (Image or PDF)</label>
+                        <div class="file-upload" id="fileUpload">
+                            <i class="fas fa-file-upload"></i>
+                            <p>Click to upload your prescription</p>
+                            <input type="file" id="prescriptionFile" accept="image/*,.pdf" style="display: none;">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="cta-button">
+                        <i class="fas fa-paper-plane"></i> Send Prescription
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" style="background: rgba(13, 71, 161, 0.7);">
+            <div class="section-header">
+                <h2>Our Services</h2>
+                <p>Comprehensive healthcare services tailored to your needs</p>
+            </div>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-prescription-bottle"></i>
+                    </div>
+                    <h3>Prescription Services</h3>
+                    <p>Fast and accurate prescription filling with pharmacist consultation.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <h3>Health Screenings</h3>
+                    <p>Blood pressure, cholesterol, diabetes and other health screenings.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-baby"></i>
+                    </div>
+                    <h3>Baby Care</h3>
+                    <p>Specialized products and advice for infant and child care.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-truck"></i>
+                    </div>
+                    <h3>Home Delivery</h3>
+                    <p>Convenient delivery of medications to your doorstep.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-user-md"></i>
+                    </div>
+                    <h3>Pharmacist Consultation</h3>
+                    <p>Personalized advice from our experienced pharmacists.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-pills"></i>
+                    </div>
+                    <h3>OTC Medications</h3>
+                    <p>Wide range of over-the-counter medicines and health products.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Appointments Section -->
+        <section id="appointments">
+            <div class="section-header">
+                <h2>Book an Appointment</h2>
+                <p>Schedule a consultation with our pharmacists or specialists</p>
+            </div>
+            
+            <div class="card" style="max-width: 700px; margin: 0 auto;">
+                <h3 style="text-align: center; margin-bottom: 2rem; color: var(--primary-color);">SIMED Pharmacy Appointments</h3>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="apptName">Full Name *</label>
+                            <input type="text" id="apptName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptPhone">Phone Number *</label>
+                            <input type="tel" id="apptPhone" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="apptDate">Preferred Date *</label>
+                            <input type="date" id="apptDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="apptTime">Preferred Time *</label>
+                            <select id="apptTime" required>
+                                <option value="">Select Time</option>
+                                <option value="9am">9:00 AM</option>
+                                <option value="10am">10:00 AM</option>
+                                <option value="11am">11:00 AM</option>
+                                <option value="1pm">1:00 PM</option>
+                                <option value="2pm">2:00 PM</option>
+                                <option value="3pm">3:00 PM</option>
+                                <option value="4pm">4:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="apptReason">Reason for Appointment *</label>
+                        <textarea id="apptReason" required placeholder="Please describe the reason for your appointment..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="cta-button">
+                        <i class="fas fa-calendar-check"></i> Book Appointment
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" style="background: rgba(66, 165, 245, 0.8);">
+            <div class="section-header">
+                <h2>Contact Us</h2>
+                <p>Reach out to us for any inquiries or assistance</p>
+            </div>
+            
+            <div class="card" style="max-width: 800px; margin: 0 auto;">
+                <div class="form-row">
+                    <div class="form-group" style="flex: 1;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Our Information</h3>
+                        <div class="contact-info">
+                            <div class="contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>123 Health Street, Medical District, Harare</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-phone-alt"></i>
+                                <span>+263 779242953</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>info@simedpharmacy.co.zw</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="fas fa-clock"></i>
+                                <span>Mon-Fri: 8am-8pm, Sat: 9am-5pm, Sun: 10am-2pm</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 2rem;">
+                            <a href="https://wa.me/263779242953" class="cta-button" target="_blank" style="display: inline-flex;">
+                                <i class="fab fa-whatsapp"></i> Chat on WhatsApp
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group" style="flex: 1;">
+                        <h3 style="color: var(--primary-color); margin-bottom: 1.5rem;">Send a Message</h3>
+                        <form>
+                            <div class="form-group">
+                                <input type="text" placeholder="Your Name" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="email" placeholder="Your Email" required>
+                            </div>
+                            <div class="form-group">
+                                <input type="tel" placeholder="Your Phone">
+                            </div>
+                            <div class="form-group">
+                                <textarea placeholder="Your Message" rows="4" required></textarea>
+                            </div>
+                            <button type="submit" class="cta-button">
+                                <i class="fas fa-paper-plane"></i> Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chatbot Modal -->
+        <div class="chatbot-btn" id="chatbotBtn">
+            <i class="fas fa-comment-medical"></i>
+        </div>
+        
+        <div class="chatbot-modal" id="chatbotModal">
+            <div class="chatbot-header">
+                <h3><i class="fas fa-robot"></i> Pharmacy Assistant</h3>
+                <button class="close-chatbot">&times;</button>
+            </div>
+            
+            <div class="chatbot-body" id="chatbotBody">
+                <div class="chatbot-message">
+                    <p>Hello! I'm your Pharmacy Assistant. How can I help you today?</p>
+                </div>
+                
+                <div class="chatbot-message">
+                    <p>Here are some common questions:</p>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>What are your operating hours?</li>
+                        <li>Do you deliver medications?</li>
+                        <li>Can I refill my prescription online?</li>
+                        <li>What vaccines do you offer?</li>
+                        <li>Do you accept my medical aid?</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="chatbot-input">
+                <input type="text" id="chatbotInput" placeholder="Ask a question...">
+                <button id="sendChatbotMessage"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-column">
+                <h3>SIMED Pharmacy</h3>
+                <p>Your trusted healthcare partner providing quality medications, health products, and personalized pharmaceutical services.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#catalogue">Catalogue</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#prescription">Prescription</a></li>
+                    <li><a href="#appointments">Appointments</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Services</h3>
+                <ul>
+                    <li><a href="#">Prescription Filling</a></li>
+                    <li><a href="#">Health Screenings</a></li>
+                    <li><a href="#">Vaccinations</a></li>
+                    <li><a href="#">Medication Therapy Management</a></li>
+                    <li><a href="#">Home Delivery</a></li>
+                    <li><a href="#">Compounding Services</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-column">
+                <h3>Contact Info</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span>123 Health Street, Medical District, Harare</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt"></i>
+                        <span>+263 779242953</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <span>info@simedpharmacy.co.zw</span>
+                    </div>
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Mon-Fri: 8am-8pm, Sat: 9am-5pm, Sun: 10am-2pm</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="copyright">
+            <p>&copy; 2023 SIMED Pharmacy. All rights reserved. | Designed with <i class="fas fa-heart" style="color: var(--accent-color);"></i> for your health</p>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize chatbot functionality
+        const faqData = {
+            "hours": "Our operating hours are:<br><br>Monday - Friday: 8:00 AM - 8:00 PM<br>Saturday: 9:00 AM - 5:00 PM<br>Sunday: 10:00 AM - 2:00 PM",
+            "delivery": "Yes, we offer home delivery service for medications and health products. Delivery is available within a 10km radius for a small fee. Orders placed before 3pm are delivered the same day.",
+            "prescription": "You can refill prescriptions by:<br>1. Calling us at +263 779242953<br>2. Using our prescription upload form on the website<br>3. Visiting the pharmacy in person<br>4. Through our mobile app (coming soon)",
+            "vaccines": "We offer the following vaccinations:<br>- Flu vaccine<br>- COVID-19 vaccine and boosters<br>- Pneumonia vaccine<br>- Shingles vaccine<br>- Tetanus, diphtheria, pertussis (Tdap)<br>- Travel vaccines (please consult with our pharmacists)",
+            "medical aid": "We accept all major medical aid providers in Zimbabwe. Please bring your medical aid card when visiting the pharmacy. For prescription refills, please have your membership information ready.",
+            "hello": "Hello! How can I assist you with your pharmacy needs today?",
+            "hi": "Hi there! I'm your pharmacy assistant. How can I help?",
+            "contact": "You can reach us at:<br>Phone: +263 779242953<br>Email: info@simedpharmacy.co.zw<br>Address: 123 Health Street, Medical District, Harare<br><br>We're available Mon-Fri: 8am-8pm, Sat: 9am-5pm, Sun: 10am-2pm",
+            "services": "We offer a wide range of services including:<br>- Prescription filling<br>- Medication therapy management<br>- Health screenings (BP, cholesterol, diabetes)<br>- Vaccinations<br>- Home delivery<br>- Baby care products<br>- Health and wellness consultations",
+            "location": "We're located at:<br>123 Health Street, Medical District, Harare<br><br>You can find us near City Hospital, opposite the Medical Center building.",
+            "thank": "You're welcome! Let me know if you need anything else.",
+            "thanks": "Happy to help! Feel free to ask if you have more questions."
+        };
+
+        // Chatbot functionality
+        const chatbotBtn = document.getElementById('chatbotBtn');
+        const chatbotModal = document.getElementById('chatbotModal');
+        const closeChatbot = document.querySelector('.close-chatbot');
+        const chatbotBody = document.getElementById('chatbotBody');
+        const chatbotInput = document.getElementById('chatbotInput');
+        const sendChatbotMessage = document.getElementById('sendChatbotMessage');
+
+        chatbotBtn.addEventListener('click', () => {
+            chatbotModal.style.display = 'block';
+            chatbotInput.focus();
+        });
+
+        closeChatbot.addEventListener('click', () => {
+            chatbotModal.style.display = 'none';
+        });
+
+        function addBotMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chatbot-message';
+            messageDiv.innerHTML = `<p>${message}</p>`;
+            chatbotBody.appendChild(messageDiv);
+            chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+
+        function handleUserMessage() {
+            const message = chatbotInput.value.trim().toLowerCase();
+            if (!message) return;
+
+            // Add user message
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'chatbot-message user-message';
+            userMessageDiv.innerHTML = `<p>${chatbotInput.value}</p>`;
+            chatbotBody.appendChild(userMessageDiv);
+
+            // Clear input
+            chatbotInput.value = '';
+
+            // Find response
+            let response = "I'm sorry, I don't understand that question. Here are some topics I can help with:<br>- Operating hours<br>- Prescription refills<br>- Delivery services<br>- Vaccinations<br>- Medical aid acceptance<br>- Our location";
+            
+            // Check for keywords in the FAQ data
+            for (const [keyword, answer] of Object.entries(faqData)) {
+                if (message.includes(keyword)) {
+                    response = answer;
+                    break;
+                }
+            }
+
+            // Simulate typing delay
+            setTimeout(() => {
+                addBotMessage(response);
+            }, 500);
+        }
+
+        sendChatbotMessage.addEventListener('click', handleUserMessage);
+        chatbotInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleUserMessage();
+        });
+
+        // Close modal when clicking outside
+        window.addEventListener('click', (e) => {
+            if (e.target === chatbotModal) {
+                chatbotModal.style.display = 'none';
+            }
+        });
+
+        // File upload functionality
+        const fileUpload = document.getElementById('fileUpload');
+        const prescriptionFile = document.getElementById('prescriptionFile');
+        
+        fileUpload.addEventListener('click', () => {
+            prescriptionFile.click();
+        });
+        
+        prescriptionFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                const fileName = e.target.files[0].name;
+                fileUpload.innerHTML = `
+                    <i class="fas fa-file-medical" style="color: green;"></i>
+                    <p>${fileName}</p>
+                    <small>Click to change file</small>
+                `;
+            }
+        });
+
+        // Form submission for prescription
+        document.getElementById('prescriptionForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form values
+            const fullName = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const email = document.getElementById('email').value;
+            const delivery = document.getElementById('delivery').value;
+            const notes = document.getElementById('notes').value;
+            
+            // Prepare WhatsApp message
+            const whatsappMessage = `New Prescription Submission:\n\nName: ${fullName}\nPhone: ${phone}\nEmail: ${email}\nDelivery: ${delivery}\nNotes: ${notes}\n\nPlease attach the prescription image below.`;
+            const whatsappUrl = `https://wa.me/263779242953?text=${encodeURIComponent(whatsappMessage)}`;
+            
+            // Open WhatsApp
+            window.open(whatsappUrl, '_blank');
+            
+            // Show confirmation
+            alert('Thank you! Your prescription details have been sent. Please attach your prescription image in WhatsApp.');
+            
+            // Reset form
+            e.target.reset();
+            fileUpload.innerHTML = `
+                <i class="fas fa-file-upload"></i>
+                <p>Click to upload your prescription</p>
+            `;
+        });
+    </script>
+</body>
+</html>
